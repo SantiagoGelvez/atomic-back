@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'projects',
     'revisions',
     'comments',
+    'storages',
 ]
 
 MIDDLEWARE = [
@@ -140,3 +141,25 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')])
 CORS_ALLOW_CREDENTIALS = True
+
+# AWS S3
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": config('AWS_ACCESS_KEY_ID'),
+            "secret_key": config('AWS_SECRET_ACCESS_KEY'),
+            "bucket_name": config('AWS_STORAGE_BUCKET_NAME'),
+            "region_name": config('AWS_S3_REGION_NAME'),
+            "default_acl": None,
+        }
+    },
+    "staticfiles": {
+        "BACKEND": "storages.backends.s3boto3.S3StaticStorage",
+        "OPTIONS": {
+            "bucket_name": config('AWS_STORAGE_BUCKET_NAME'),
+        }
+    },
+}
+
+MEDIA_URL = f"https://{STORAGES['default']['OPTIONS']['bucket_name']}.s3.amazonaws.com/"
