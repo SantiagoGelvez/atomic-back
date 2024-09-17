@@ -31,7 +31,7 @@ def main():
         # Aplicar migraciones y recolectar archivos estáticos
         run_command(makemigrations)
         run_command(migrate)
-        run_command(collectstatic)
+        # run_command(collectstatic)
 
         # Reiniciar Gunicorn
         try:
