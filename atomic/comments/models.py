@@ -6,7 +6,7 @@ from revisions.models import Revision
 from users.models import User
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     uuid = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     text = models.TextField()
     image_s3_key = models.CharField(max_length=255, null=True, blank=True)
@@ -17,4 +17,4 @@ class Comments(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'{self.revision_uuid} - {self.user_uuid}'
+        return f'{self.text[:50]}... by {self.user} on {self.revision}'
