@@ -21,7 +21,7 @@ def main():
         manage_py = '/home/ubuntu/back/atomic-back/atomic'
 
         # Activar el entorno virtual y ejecutar comandos dentro de él
-        pip_install = f"{venv_bin}/pip install -r {manage_py}/requirements.txt"
+        pip_install = f"{venv_bin}/pip install -r /home/ubuntu/back/atomic-back/requirements.txt"
         run_command(pip_install)
 
         makemigrations = f"{venv_bin}/python {manage_py}/manage.py makemigrations"
