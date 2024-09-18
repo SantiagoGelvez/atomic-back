@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.core.exceptions import ObjectDoesNotExist
 
+from comments.serializers import CommentSerializer
 from .models import Revision
 from projects.models import Project
 from .serializers import RevisionSerializer
@@ -66,3 +67,41 @@ class RevisionsView(APIView):
 
         revision.delete()
         return Response({'message': 'Revision deleted successfully'}, status=status.HTTP_200_OK)
+
+
+class RevisionCommentsView(APIView):
+    def get(self, request, uuid):
+        user = get_user_from_jwt_token(request.COOKIES.get('jwt'))
+
+        try:
+            revision = Revision.objects.get(uuid=uuid)
+        except ObjectDoesNotExist:
+            return Response({'detail': 'Revision not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if revision.user.company != user.company:
+            return Response({'detail': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        comments = revision.comment_set.filter(reply_to=None).order_by('-created_at')
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, uuid):
+        user = get_user_from_jwt_token(request.COOKIES.get('jwt'))
+
+        try:
+            revision = Revision.objects.get(uuid=uuid)
+        except ObjectDoesNotExist:
+            return Response({'detail': 'Revision not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        if revision.user.company != user.company:
+            return Response({'detail': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        comments_data = request.data.copy()
+
+        serializer = CommentSerializer(data=comments_data, context={'user': user, 'revision': revision})
+        if serializer.is_valid():
+            serializer.save()
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'message': 'Comments created successfully'}, status=status.HTTP_201_CREATED)
