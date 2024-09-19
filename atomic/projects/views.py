@@ -27,7 +27,7 @@ class ProjectsView(APIView):
             serializer = ProjectSerializer(project)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        projects = Project.objects.filter(creator__company=user.company)
+        projects = Project.objects.filter(creator__company=user.company).order_by('-created_at')
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -89,7 +89,7 @@ class ProjectRevisionsView(APIView):
         if project.creator.company != user.company:
             return Response({'detail': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        revisions = project.revision_set.all()
+        revisions = project.revision_set.all().order_by('-created_at')
         serializer = RevisionSerializer(revisions, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
