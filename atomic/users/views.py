@@ -49,7 +49,7 @@ class LoginView(APIView):
             return Response({'detail': 'Debes ingresar email o usuario'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            user = User.objects.get(Q(email__iexact=email_username) | Q(username__iexact=email_username))
+            user = User.objects.get(Q(email__iexact=email_username) | Q(username=email_username))
         except ObjectDoesNotExist:
             return Response({'detail': 'Aún no tenemos tu cuenta registrada en nuestro sistema'}, status=status.HTTP_404_NOT_FOUND)
 
